@@ -3,8 +3,7 @@ version: "3.0"
 services:
   app:
     build: .
-    ports:
-      - "7777:7777"
+    network_mode: host
     env_file:
       - .env
     environment:
