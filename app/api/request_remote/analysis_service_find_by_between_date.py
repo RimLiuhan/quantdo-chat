@@ -27,7 +27,7 @@ def analysis_service_find_by_between_date(startDate="20250420", endDate="2026042
     """
     # 配置参数
     remote_data_center_ip = os.getenv("remote_data_center_ip")
-    api_url = f"http://{remote_data_center_ip}/qdpms/findByBetweenDate"
+    api_url = f"http://{remote_data_center_ip}/qdpms/attributionAnalysisService/findByBetweenDate"
     apikey = os.getenv("api_key")
     secrekey = os.getenv("secrekey")
     client_ip = os.getenv("client_ip")
