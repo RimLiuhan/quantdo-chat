@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>任意页面 - 智能助手浮窗</title>
+  <style>
+    /* 浮动按钮样式 */
+    .chat-float-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+    }
+    .chat-float-btn:hover {
+      background: #4338ca;
+    }
+
+    /* 浮窗容器 */
+    .chat-widget {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 400px;
+      height: 600px;
+      max-height: calc(100vh - 120px);
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      background: white;
+      display: none; /* 默认隐藏 */
+      flex-direction: column;
+      z-index: 9999;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    .chat-widget.open {
+      display: flex;
+    }
+
+    /* 头部条（可拖拽）*/
+    .chat-widget-header {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move; /* 如有需要可配合 JS 实现拖拽 */
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    /* iframe 充满剩余空间 */
+    .chat-widget iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- 这里是你网站原本的内容 -->
+  <h1>我的网站</h1>
+  <p>这里是正文内容...</p>
+
+  <!-- 浮动触发按钮 -->
+  <button class="chat-float-btn" id="chatToggle">💬</button>
+
+  <!-- 聊天浮窗 -->
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-widget-header">
+      <span>DeepAgent 助手</span>
+      <button class="close-btn" id="chatClose">✕</button>
+    </div>
+    <iframe
+      id="chatIframe"
+      src="http://localhost:7860"
+      allow="microphone; camera"
+    ></iframe>
+  </div>
+
+  <script>
+    const widget = document.getElementById('chatWidget');
+    const toggleBtn = document.getElementById('chatToggle');
+    const closeBtn = document.getElementById('chatClose');
+
+    // 点击浮动按钮，切换显示/隐藏
+    toggleBtn.addEventListener('click', () => {
+      widget.classList.toggle('open');
+    });
+
+    // 点击头部关闭按钮，隐藏浮窗
+    closeBtn.addEventListener('click', () => {
+      widget.classList.remove('open');
+    });
+
+    // 可选：点击页面其他区域关闭浮窗（可按需启用）
+    // document.addEventListener('click', (e) => {
+    //   if (!widget.contains(e.target) && e.target !== toggleBtn) {
+    //     widget.classList.remove('open');
+    //   }
+    // });
+  </script>
+</body>
+</html>
