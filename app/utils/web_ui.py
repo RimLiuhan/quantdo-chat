@@ -13,6 +13,24 @@ footer { visibility: hidden !important; }
 .input-row .textbox { flex: 1 !important; }
 .input-row { align-items: stretch !important; }
 
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
 """
 # 注入 ECharts CDN 和自动渲染脚本
 js_code = """
@@ -41,6 +59,32 @@ js_code = """
         });
     }
 
+    // 将工具调用提示替换为"正在思考中"
+    function replaceToolNoticesWithThinking() {
+        const notices = document.querySelectorAll('.tool-call-notice');
+        notices.forEach(notice => {
+            // 创建"正在思考中"的占位元素
+            const thinkingSpan = document.createElement('span');
+            thinkingSpan.className = 'thinking-placeholder';
+            thinkingSpan.style.cssText = 'display: inline-flex; align-items: center; gap: 6px; color: #888; font-size: 13px; padding: 2px 0;';
+            thinkingSpan.innerHTML = '<span style="display: inline-block; animation: pulse 1.2s ease-in-out infinite;">✨</span><span>正在思考<span style="display: inline-block; animation: dots 1.4s steps(4,end) infinite;">...</span></span>';
+
+            // 替换节点
+            if (notice.parentNode) {
+                notice.parentNode.replaceChild(thinkingSpan, notice);
+            }
+        });
+    }
+
+    // 移除"正在思考中"占位符
+    function removeThinkingPlaceholders() {
+        const thinkingElements = document.querySelectorAll('.thinking-placeholder');
+        thinkingElements.forEach(thinking => {
+            // 使用 display: none 完全移除，不留空白
+            thinking.style.display = 'none';
+        });
+    }
+
     // 初始渲染
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', renderEcharts);
@@ -49,11 +93,48 @@ js_code = """
     }
 
     // 监听动态变化
-    const observer = new MutationObserver(() => renderEcharts());
+    const observer = new MutationObserver((mutations) => {
+        renderEcharts();
+
+        // 检查是否有新的非工具提示内容出现
+        let hasNewContent = false;
+        let hasTextContent = false;
+
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // 如果新增节点不是工具调用提示或思考占位，则触发清理
+                    if (!node.classList || 
+                        (!node.classList.contains('tool-call-notice') && 
+                         !node.classList.contains('thinking-placeholder'))) {
+                        hasNewContent = true;
+                    }
+                    // 检查是否是文本内容或包含文本的元素
+                    if (node.textContent && node.textContent.trim().length > 0) {
+                        hasTextContent = true;
+                    }
+                } else if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                    hasTextContent = true;
+                    hasNewContent = true;
+                }
+            });
+        });
+
+        // 如果有新内容且存在工具提示，则替换为"正在思考中"
+        if (hasNewContent && document.querySelectorAll('.tool-call-notice').length > 0) {
+            setTimeout(replaceToolNoticesWithThinking, 800);
+        }
+
+        // 如果有新内容且存在思考占位符，则移除
+        if (hasNewContent && document.querySelectorAll('.thinking-placeholder').length > 0) {
+            setTimeout(removeThinkingPlaceholders, 300);
+        }
+    });
     observer.observe(document.body, { childList: true, subtree: true });
 })();
 </script>
 """
+
 
 def generate_chart_div(option):
     """生成纯 div 容器，不含 <script>，由前端统一渲染"""

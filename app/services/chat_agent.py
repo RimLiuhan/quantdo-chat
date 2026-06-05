@@ -141,6 +141,12 @@ def ask_stream(query: str):
             yield chunk.reasoning_content
         if hasattr(chunk, "content") and chunk.content and chunk.type == "AIMessageChunk":
             yield chunk.content
+            # 检测工具调用并输出提示信息
+        if hasattr(chunk, "tool_calls") and chunk.tool_calls:
+            for tc in chunk.tool_calls:
+                tool_name = tc.get("name", "")
+                if tool_name:
+                    yield f'<span class="tool-call-notice" data-tool-name="{tool_name}" style="display: inline-block; padding: 2px 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; font-size: 11px; line-height: 1.2; margin: 2px 0;">🔧 正在调用{tool_name}...</span>'
 
     # --- 第二阶段：提取结果（不再次调用 invoke） ---
     # 此时 agent 的状态已经更新到了内存中，我们直接读取最新状态
