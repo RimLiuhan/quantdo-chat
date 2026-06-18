@@ -13,6 +13,7 @@ from app.tools.generate_option import send_chart_option
 from app.tools.get_current_date import get_current_date
 from langgraph.checkpoint.memory import MemorySaver
 from app.services.prompts import system_prompt
+from app.utils.logger import log_messages
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional, List
 import gradio as gr
@@ -73,6 +74,7 @@ def ask(query: str) -> AgentResponse:
     result = agent.invoke(inputs, config)
 
     all_messages = result["messages"]
+    log_messages(all_messages)
     chart_option = None
     answer_text = ""
 
@@ -152,6 +154,7 @@ def ask_stream(query: str):
     # 此时 agent 的状态已经更新到了内存中，我们直接读取最新状态
     state = agent.get_state(config)
     all_messages = state.values.get("messages", [])
+    log_messages(all_messages)
 
     current_chart_option = None
 

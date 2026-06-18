@@ -10,6 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt \
 
 COPY . .
 
-EXPOSE 7777
+EXPOSE 8761
 
 CMD ["python", "-m", "app.utils.web_ui"]

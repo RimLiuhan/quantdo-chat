@@ -242,4 +242,4 @@ def create_ui():
 
 if __name__ == "__main__":
     ui = create_ui()
-    ui.launch(server_name="0.0.0.0", server_port=7777, share=False, css=custom_css,head=js_code)
+    ui.launch(server_name="0.0.0.0", server_port=8761, share=False, css=custom_css,head=js_code)
